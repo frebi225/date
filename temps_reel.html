@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heure en temps réel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: #fdbb2d;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: #ccc;
+        }
+        .clock-container {
+            position: relative;
+            margin: 30px 0;
+        }
+        .time-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 2.5rem;
+            text-align: center;
+            border: 3px solid #3498db;
+            border-radius: 15px;
+            background-color: #111;
+            color: #3498db;
+            font-weight: bold;
+            letter-spacing: 3px;
+            box-sizing: border-box;
+        }
+        .time-input:focus {
+            outline: none;
+            border-color: #fdbb2d;
+            box-shadow: 0 0 15px rgba(253, 187, 45, 0.5);
+        }
+        .format {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #ccc;
+        }
+        .digital-clock {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(253, 187, 45, 0.8);
+        }
+        .date-display {
+            font-size: 1.5rem;
+            margin-top: 15px;
+            color: #3498db;
+        }
+        .instructions {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Heure en Temps Réel</h1>
+        <div class="subtitle">L'heure système actualisée chaque seconde</div>
+        
+        <div class="clock-container">
+            <input type="text" id="timeInput" class="time-input" readonly>
+            <div class="format">Format HH:MM:SS</div>
+        </div>
+        
+        <div class="digital-clock">
+            <span id="hours" class="blink">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+        </div>
+        
+        <div class="date-display" id="dateDisplay"></div>
+        
+        <div class="instructions">
+            <p>Cette page affiche l'heure système en temps réel, mise à jour automatiquement chaque seconde à l'aide de JavaScript.</p>
+            <p>L'heure est affichée au format HH:MM:SS (heures:minutes:secondes).</p>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour formater les nombres avec un zéro devant si nécessaire
+        function formatTime(number) {
+            return number < 10 ? '0' + number : number;
+        }
+
+        // Fonction pour mettre à jour l'affichage de l'heure
+        function updateTime() {
+            const now = new Date();
+            
+            // Obtenir les composants de l'heure
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            
+            // Formater l'heure au format HH:MM:SS
+            const timeString = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
+            
+            // Mettre à jour la zone de saisie
+            document.getElementById('timeInput').value = timeString;
+            
+            // Mettre à jour l'affichage digital
+            document.getElementById('hours').textContent = formatTime(hours);
+            document.getElementById('minutes').textContent = formatTime(minutes);
+            document.getElementById('seconds').textContent = formatTime(seconds);
+            
+            // Mettre à jour la date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateDisplay').textContent = now.toLocaleDateString('fr-FR', options);
+            
+            // Planifier la prochaine mise à jour
+            setTimeout(updateTime, 1000);
+        }
+
+        // Démarrer la mise à jour de l'heure
+        updateTime();
+    </script>
+</body>
+</html>

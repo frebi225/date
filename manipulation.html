@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercice 3 - Manipulation de dates</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin-top: 20px;
+        }
+        .result-item {
+            margin: 15px 0;
+            padding: 12px;
+            background-color: #e8f4fc;
+            border-radius: 5px;
+        }
+        .result-label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .instructions {
+            background-color: #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .date-format {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manipulation de dates</h1>
+        
+        <div class="input-group">
+            <label for="inputDate">Saisissez une date au format JJ-MM-AAAA :</label>
+            <input type="text" id="inputDate" placeholder="Ex: 25-12-2023">
+            <div class="date-format">Format: Jour-Mois-Année (ex: 01-01-2023)</div>
+        </div>
+        
+        <button id="calculateDate">Calculer</button>
+        
+        <div class="results">
+            <h2>Composants de la date :</h2>
+            <div class="result-item">
+                <span class="result-label">Jour :</span>
+                <span id="dayResult">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Mois :</span>
+                <span id="monthResult">-</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Année :</span>
+                <span id="yearResult">-</span>
+            </div>
+            
+            <h2>Différence avec aujourd'hui :</h2>
+            <div class="result-item">
+                <span class="result-label">Différence en jours :</span>
+                <span id="diffResult">-</span>
+            </div>
+        </div>
+        
+        <div id="errorMessage" class="error"></div>
+        
+        <div class="instructions">
+            <p><strong>Instructions :</strong></p>
+            <ul>
+                <li>Saisissez une date au format JJ-MM-AAAA (ex: 25-12-2023)</li>
+                <li>Cliquez sur le bouton "Calculer" pour analyser la date</li>
+                <li>Les composants de la date (jour, mois, année) seront affichés</li>
+                <li>La différence en jours avec la date actuelle sera calculée</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Sélection des éléments du DOM
+        const inputElement = document.getElementById('inputDate');
+        const calculateButton = document.getElementById('calculateDate');
+        const dayResultElement = document.getElementById('dayResult');
+        const monthResultElement = document.getElementById('monthResult');
+        const yearResultElement = document.getElementById('yearResult');
+        const diffResultElement = document.getElementById('diffResult');
+        const errorElement = document.getElementById('errorMessage');
+
+        // Fonction pour valider et convertir la date
+        function convertirDate(dateStr) {
+            // Vérifier le format avec une expression régulière
+            const regex = /^(\d{2})-(\d{2})-(\d{4})$/;
+            const match = dateStr.match(regex);
+            
+            if (!match) {
+                throw new Error("Format de date invalide. Utilisez JJ-MM-AAAA.");
+            }
+            
+            const jour = parseInt(match[1], 10);
+            const mois = parseInt(match[2], 10) - 1; // Les mois commencent à 0 en JavaScript
+            const annee = parseInt(match[3], 10);
+            
+            // Valider les valeurs
+            if (mois < 0 || mois > 11) {
+                throw new Error("Le mois doit être entre 01 et 12.");
+            }
+            
+            if (jour < 1 || jour > 31) {
+                throw new Error("Le jour doit être entre 01 et 31.");
+            }
+            
+            // Créer l'objet Date
+            const date = new Date(annee, mois, jour);
+            
+            // Vérifier si la date est valide
+            if (date.getFullYear() !== annee || date.getMonth() !== mois || date.getDate() !== jour) {
+                throw new Error("Date invalide.");
+            }
+            
+            return date;
+        }
+
+        // Fonction pour calculer la différence en jours entre deux dates
+        function differenceEnJours(date1, date2) {
+            // Convertir les dates en timestamp (millisecondes)
+            const time1 = date1.getTime();
+            const time2 = date2.getTime();
+            
+            // Calculer la différence en millisecondes
+            const differenceMs = Math.abs(time2 - time1);
+            
+            // Convertir en jours (1 jour = 24 * 60 * 60 * 1000 ms)
+            const differenceJours = Math.floor(differenceMs / (1000 * 60 * 60 * 24));
+            
+            return differenceJours;
+        }
+
+        // Fonction pour formater l'affichage du mois
+        function getMonthName(monthIndex) {
+            const months = [
+                "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+            ];
+            return months[monthIndex];
+        }
+
+        // Fonction principale pour traiter la date
+        function processDate() {
+            // Réinitialiser les messages d'erreur
+            errorElement.textContent = "";
+            
+            try {
+                const dateStr = inputElement.value.trim();
+                
+                if (!dateStr) {
+                    throw new Error("Veuillez saisir une date.");
+                }
+                
+                // Convertir la date saisie
+                const dateSaisie = convertirDate(dateStr);
+                
+                // Afficher les composants de la date
+                dayResultElement.textContent = dateSaisie.getDate();
+                monthResultElement.textContent = `${getMonthName(dateSaisie.getMonth())} (${dateSaisie.getMonth() + 1})`;
+                yearResultElement.textContent = dateSaisie.getFullYear();
+                
+                // Calculer la différence avec la date actuelle
+                const aujourdHui = new Date();
+                // Réinitialiser les heures pour une comparaison précise des jours
+                aujourdHui.setHours(0, 0, 0, 0);
+                dateSaisie.setHours(0, 0, 0, 0);
+                
+                const difference = differenceEnJours(aujourdHui, dateSaisie);
+                
+                // Déterminer si la date est dans le passé ou le futur
+                let indicationTemps = "";
+                if (dateSaisie > aujourdHui) {
+                    indicationTemps = "dans le futur";
+                } else if (dateSaisie < aujourdHui) {
+                    indicationTemps = "dans le passé";
+                } else {
+                    indicationTemps = "aujourd'hui";
+                }
+                
+                diffResultElement.textContent = `${difference} jours (${indicationTemps})`;
+                
+            } catch (error) {
+                errorElement.textContent = error.message;
+                
+                // Réinitialiser les résultats en cas d'erreur
+                dayResultElement.textContent = "-";
+                monthResultElement.textContent = "-";
+                yearResultElement.textContent = "-";
+                diffResultElement.textContent = "-";
+            }
+        }
+
+        // Écouteur d'événement pour le bouton de calcul
+        calculateButton.addEventListener('click', processDate);
+
+        // Écouteur d'événement pour la touche Entrée
+        inputElement.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                processDate();
+            }
+        });
+    </script>
+</body>
+</html>
