@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de prêt hypothécaire</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f8fa;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .input-icon {
+            position: relative;
+        }
+        .input-icon input {
+            padding-left: 40px;
+        }
+        .input-icon::before {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+        .loan-amount::before {
+            content: "F";
+        }
+        .interest-rate::before {
+            content: "%";
+        }
+        .loan-term::before {
+            content: "Y";
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            background-color: #e8f4fc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .result h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .monthly-payment {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #3498db;
+            margin: 15px 0;
+        }
+        .details {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .detail-item {
+            background-color: #d6eaf8;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            min-width: 150px;
+            text-align: center;
+        }
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .instructions {
+            background-color: #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            .details {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculateur de prêt hypothécaire</h1>
+        
+        <div class="form-group">
+            <label for="loanAmount">Montant du prêt (Fcfa)</label>
+            <div class="input-icon loan-amount">
+                <input type="number" id="loanAmount" placeholder="Ex: 200000" min="1" step="1000">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="interestRate">Taux d'intérêt annuel (%)</label>
+            <div class="input-icon interest-rate">
+                <input type="number" id="interestRate" placeholder="Ex: 3.5" min="0.1" step="0.1">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="loanTerm">Durée du prêt (années)</label>
+            <div class="input-icon loan-term">
+                <input type="number" id="loanTerm" placeholder="Ex: 25" min="1" max="40">
+            </div>
+        </div>
+        
+        <button id="calculateButton">Calculer la mensualité</button>
+        
+        <div class="result" id="resultSection" style="display: none;">
+            <h2>Votre mensualité</h2>
+            <div class="monthly-payment" id="monthlyPayment">-</div>
+            
+            <div class="details">
+                <div class="detail-item">
+                    <div>Total payé</div>
+                    <div class="detail-value" id="totalPayment">-</div>
+                </div>
+                <div class="detail-item">
+                    <div>Total intérêts</div>
+                    <div class="detail-value" id="totalInterest">-</div>
+                </div>
+                <div class="detail-item">
+                    <div>Nombre de paiements</div>
+                    <div class="detail-value" id="numberOfPayments">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="formula">
+            <p><strong>Formule utilisée :</strong> M = P × (r × (1 + r)^n) / ((1 + r)^n - 1)</p>
+            <p>Où :<br>
+            - M = Paiement mensuel<br>
+            - P = Montant du prêt<br>
+            - r = Taux d'intérêt mensuel (taux annuel / 12 / 100)<br>
+            - n = Nombre total de paiements (années × 12)</p>
+        </div>
+        
+        <div class="instructions">
+            <p><strong>Instructions :</strong></p>
+            <ul>
+                <li>Entrez le montant du prêt (doit être positif)</li>
+                <li>Entrez le taux d'intérêt annuel en pourcentage (ex: 3.5 pour 3.5%)</li>
+                <li>Entrez la durée du prêt en années (entre 1 et 40)</li>
+                <li>Cliquez sur "Calculer la mensualité" pour voir les résultats</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Sélection des éléments du DOM
+        const loanAmountInput = document.getElementById('loanAmount');
+        const interestRateInput = document.getElementById('interestRate');
+        const loanTermInput = document.getElementById('loanTerm');
+        const calculateButton = document.getElementById('calculateButton');
+        const monthlyPaymentElement = document.getElementById('monthlyPayment');
+        const totalPaymentElement = document.getElementById('totalPayment');
+        const totalInterestElement = document.getElementById('totalInterest');
+        const numberOfPaymentsElement = document.getElementById('numberOfPayments');
+        const resultSection = document.getElementById('resultSection');
+        
+        // Fonction de calcul de la mensualité
+        function calculateMonthlyPayment() {
+            // Récupération et validation des valeurs
+            const loanAmount = parseFloat(loanAmountInput.value);
+            const annualInterestRate = parseFloat(interestRateInput.value);
+            const loanTermYears = parseFloat(loanTermInput.value);
+            
+            // Validation des entrées
+            if (isNaN(loanAmount) || loanAmount <= 0) {
+                alert("Veuillez entrer un montant de prêt valide et positif.");
+                return;
+            }
+            
+            if (isNaN(annualInterestRate) || annualInterestRate <= 0) {
+                alert("Veuillez entrer un taux d'intérêt valide et positif.");
+                return;
+            }
+            
+            if (isNaN(loanTermYears) || loanTermYears <= 0 || loanTermYears > 40) {
+                alert("Veuillez entrer une durée de prêt valide (entre 1 et 40 années).");
+                return;
+            }
+            
+            // Calculs intermédiaires
+            const monthlyInterestRate = (annualInterestRate / 100) / 12;
+            const numberOfPayments = loanTermYears * 12;
+            
+            // Calcul de la mensualité selon la formule
+            const monthlyPayment = loanAmount * 
+                (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) / 
+                (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
+            
+            // Calcul des totaux
+            const totalPayment = monthlyPayment * numberOfPayments;
+            const totalInterest = totalPayment - loanAmount;
+            
+            // Affichage des résultats
+            monthlyPaymentElement.textContent = monthlyPayment.toFixed(2) + " Fcfa";
+            totalPaymentElement.textContent = totalPayment.toFixed(2) + " Fcfa";
+            totalInterestElement.textContent = totalInterest.toFixed(2) + " Fcfa";
+            numberOfPaymentsElement.textContent = numberOfPayments;
+            
+            // Affichage de la section des résultats
+            resultSection.style.display = "block";
+        }
+        
+        // Écouteur d'événement pour le bouton de calcul
+        calculateButton.addEventListener('click', calculateMonthlyPayment);
+        
+        // Permettre le calcul avec la touche Entrée
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    calculateMonthlyPayment();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

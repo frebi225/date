@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercice 4 - Manipulation de tableaux</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f8fa;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .array-display {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .array-content {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+            min-height: 40px;
+            padding: 10px;
+        }
+        .operations {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .operation-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .operation-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .sort-section {
+            background-color: #e8f4fc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .instructions {
+            background-color: #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manipulation de tableaux</h1>
+        
+        <div class="array-display">
+            <h2>Tableau actuel :</h2>
+            <div id="arrayContent" class="array-content">5, 2, 8, 1, 9, 3</div>
+        </div>
+        
+        <div class="operations">
+            <div class="operation-card">
+                <h3>Ajouter un élément</h3>
+                <div class="input-group">
+                    <label for="newElement">Nouvel élément :</label>
+                    <input type="number" id="newElement" placeholder="Entrez un nombre">
+                </div>
+                <button id="addButton">Ajouter à la fin</button>
+                <div id="addError" class="error"></div>
+            </div>
+            
+            <div class="operation-card">
+                <h3>Supprimer un élément</h3>
+                <div class="input-group">
+                    <label for="removeElement">Élément à supprimer :</label>
+                    <input type="number" id="removeElement" placeholder="Entrez un nombre">
+                </div>
+                <button id="removeButton">Supprimer</button>
+                <div id="removeError" class="error"></div>
+            </div>
+        </div>
+        
+        <div class="sort-section">
+            <h2>Trier le tableau</h2>
+            <button id="sortButton">Trier par ordre croissant</button>
+        </div>
+        
+        <div class="instructions">
+            <p><strong>Instructions :</strong></p>
+            <ul>
+                <li>Le tableau initial est [5, 2, 8, 1, 9, 3]</li>
+                <li>Ajoutez un nouvel élément à la fin du tableau</li>
+                <li>Supprimez un élément spécifique du tableau</li>
+                <li>Triez le tableau par ordre croissant</li>
+                <li>Le tableau est mis à jour après chaque opération</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Initialisation du tableau
+        let numbers = [5, 2, 8, 1, 9, 3];
+        
+        // Sélection des éléments du DOM
+        const arrayContentElement = document.getElementById('arrayContent');
+        const newElementInput = document.getElementById('newElement');
+        const removeElementInput = document.getElementById('removeElement');
+        const addButton = document.getElementById('addButton');
+        const removeButton = document.getElementById('removeButton');
+        const sortButton = document.getElementById('sortButton');
+        const addErrorElement = document.getElementById('addError');
+        const removeErrorElement = document.getElementById('removeError');
+        
+        // Fonction pour afficher le tableau
+        function displayArray() {
+            arrayContentElement.textContent = numbers.join(', ');
+        }
+        
+        // Fonction pour ajouter un élément à la fin du tableau
+        function addElement() {
+            addErrorElement.textContent = '';
+            
+            const newValue = newElementInput.value.trim();
+            
+            if (newValue === '') {
+                addErrorElement.textContent = 'Veuillez entrer un nombre.';
+                return;
+            }
+            
+            const numberValue = Number(newValue);
+            
+            if (isNaN(numberValue)) {
+                addErrorElement.textContent = 'Veuillez entrer un nombre valide.';
+                return;
+            }
+            
+            // Ajouter l'élément à la fin du tableau
+            numbers.push(numberValue);
+            
+            // Mettre à jour l'affichage
+            displayArray();
+            
+            // Réinitialiser le champ de saisie
+            newElementInput.value = '';
+        }
+        
+        // Fonction pour supprimer un élément du tableau
+        function removeElement() {
+            removeErrorElement.textContent = '';
+            
+            const removeValue = removeElementInput.value.trim();
+            
+            if (removeValue === '') {
+                removeErrorElement.textContent = 'Veuillez entrer un nombre.';
+                return;
+            }
+            
+            const numberValue = Number(removeValue);
+            
+            if (isNaN(numberValue)) {
+                removeErrorElement.textContent = 'Veuillez entrer un nombre valide.';
+                return;
+            }
+            
+            // Trouver l'index de l'élément à supprimer
+            const index = numbers.indexOf(numberValue);
+            
+            if (index === -1) {
+                removeErrorElement.textContent = 'Élément non trouvé dans le tableau.';
+                return;
+            }
+            
+            // Supprimer l'élément du tableau
+            numbers.splice(index, 1);
+            
+            // Mettre à jour l'affichage
+            displayArray();
+            
+            // Réinitialiser le champ de saisie
+            removeElementInput.value = '';
+        }
+        
+        // Fonction pour trier le tableau par ordre croissant
+        function sortArray() {
+            numbers.sort((a, b) => a - b);
+            displayArray();
+        }
+        
+        // Écouteurs d'événements
+        addButton.addEventListener('click', addElement);
+        removeButton.addEventListener('click', removeElement);
+        sortButton.addEventListener('click', sortArray);
+        
+        // Permettre l'utilisation de la touche Entrée
+        newElementInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addElement();
+            }
+        });
+        
+        removeElementInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                removeElement();
+            }
+        });
+        
+        // Afficher le tableau initial
+        displayArray();
+    </script>
+</body>
+</html>
